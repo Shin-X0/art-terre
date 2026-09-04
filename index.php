@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=7" />
+  <link rel="stylesheet" href="css/style.css?v=8" />
 </head>
 <body>
 
@@ -134,13 +134,16 @@
             </p>
             <div class="artwork-actions">
               <button class="story-toggle" type="button" aria-expanded="false">Story.</button>
-              <span class="artwork-price">$1.99</span>
-              <button class="card-cart" type="button" aria-label="Add “Sorry Night” to cart">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
-                  <path d="M2.5 3.5h2.6l2.5 11.2a1.8 1.8 0 0 0 1.8 1.4h7.9a1.8 1.8 0 0 0 1.8-1.4L21 7.5H6.1"/>
-                </svg>
-              </button>
+              <div class="artwork-buy">
+                <span class="artwork-price">$1.99</span>
+                <button class="btn btn-accent card-checkout" type="button" aria-label="Checkout “Sorry Night”">Checkout</button>
+                <button class="card-cart" type="button" aria-label="Add “Sorry Night” to cart">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
+                    <path d="M2.5 3.5h2.6l2.5 11.2a1.8 1.8 0 0 0 1.8 1.4h7.9a1.8 1.8 0 0 0 1.8-1.4L21 7.5H6.1"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </article>
 
@@ -155,13 +158,16 @@
             </p>
             <div class="artwork-actions">
               <button class="story-toggle" type="button" aria-expanded="false">Story.</button>
-              <span class="artwork-price">$1.99</span>
-              <button class="card-cart" type="button" aria-label="Add “Mona Liza” to cart">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
-                  <path d="M2.5 3.5h2.6l2.5 11.2a1.8 1.8 0 0 0 1.8 1.4h7.9a1.8 1.8 0 0 0 1.8-1.4L21 7.5H6.1"/>
-                </svg>
-              </button>
+              <div class="artwork-buy">
+                <span class="artwork-price">$1.99</span>
+                <button class="btn btn-accent card-checkout" type="button" aria-label="Checkout “Mona Liza”">Checkout</button>
+                <button class="card-cart" type="button" aria-label="Add “Mona Liza” to cart">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
+                    <path d="M2.5 3.5h2.6l2.5 11.2a1.8 1.8 0 0 0 1.8 1.4h7.9a1.8 1.8 0 0 0 1.8-1.4L21 7.5H6.1"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </article>
 
@@ -176,13 +182,16 @@
             </p>
             <div class="artwork-actions">
               <button class="story-toggle" type="button" aria-expanded="false">Story.</button>
-              <span class="artwork-price">$1.99</span>
-              <button class="card-cart" type="button" aria-label="Add “Christ In The Storm” to cart">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
-                  <path d="M2.5 3.5h2.6l2.5 11.2a1.8 1.8 0 0 0 1.8 1.4h7.9a1.8 1.8 0 0 0 1.8-1.4L21 7.5H6.1"/>
-                </svg>
-              </button>
+              <div class="artwork-buy">
+                <span class="artwork-price">$1.99</span>
+                <button class="btn btn-accent card-checkout" type="button" aria-label="Checkout “Christ In The Storm”">Checkout</button>
+                <button class="card-cart" type="button" aria-label="Add “Christ In The Storm” to cart">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
+                    <path d="M2.5 3.5h2.6l2.5 11.2a1.8 1.8 0 0 0 1.8 1.4h7.9a1.8 1.8 0 0 0 1.8-1.4L21 7.5H6.1"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </article>
 

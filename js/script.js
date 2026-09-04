@@ -145,6 +145,30 @@ $("#cart-btn").addEventListener("click", () => {
   );
 });
 
+/* --- 6a. Per-card Checkout (demo — real checkout comes later) --- */
+$$(".card-checkout").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const original = btn.textContent;
+
+    btn.textContent = "Purchased ✓ (demo)";
+    btn.disabled = true;
+
+    btn.animate(
+      [
+        { transform: "scale(1)" },
+        { transform: "scale(1.08)" },
+        { transform: "scale(1)" }
+      ],
+      { duration: 300, easing: "ease" }
+    );
+
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.disabled = false;
+    }, 2000);
+  });
+});
+
 /* ============================================================
    7. FORM VALIDATION (sign-in, newsletter, contact)
    ============================================================ */

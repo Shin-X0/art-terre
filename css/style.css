@@ -634,6 +634,23 @@ h1, h2, h3, h4 {
   transform: scale(1.1);
 }
 
+/* Price + Checkout + Cart cluster (right side of card actions) */
+.artwork-buy {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+/* Compact clay checkout pill — fits the card action row */
+.card-checkout {
+  padding: 0.35rem 0.95rem;
+  font-size: 0.85rem;
+}
+
+.card-checkout:active {
+  transform: translateY(0) scale(0.96);
+}
+
 /* ---------- About (sage green) ---------- */
 .about {
   background:
@@ -1006,6 +1023,9 @@ h1, h2, h3, h4 {
 
   .contact-submit { justify-content: stretch; }
   .contact-submit .btn { width: 100%; }
+
+  /* Card actions: let the buy cluster wrap below the Story pill if tight */
+  .artwork-actions { flex-wrap: wrap; row-gap: 0.5rem; }
 }
 
 /* ---------- Reduced motion ---------- */
