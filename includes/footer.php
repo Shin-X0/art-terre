@@ -63,13 +63,13 @@
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
         <div class="fb-left">
-          <a href="#">Support & Help</a>
-          <a href="#">FAQ</a>
+          <a href="support.php">Support & Help</a>
+          <a href="faq.php">FAQ</a>
         </div>
         <div class="fb-right">
-          <a href="#">Terms of services</a>
+          <a href="terms.php">Terms of services</a>
           <span class="divider" aria-hidden="true"></span>
-          <a href="#">Privacy Policy</a>
+          <a href="privacy.php">Privacy Policy</a>
         </div>
       </div>
     </div>
@@ -79,6 +79,6 @@
   <button class="to-top" id="to-top" aria-label="Back to top">↑</button>
 
   <!-- JavaScript -->
-  <script src="js/script.js?v=6"></script>
+  <script src="js/script.js?v=9"></script>
 </body>
 </html>
