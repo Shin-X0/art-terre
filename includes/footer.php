@@ -36,7 +36,22 @@
           Art Terre? We’d love to hear from you.
         </p>
 
-        <form class="contact-form" id="contact-form" novalidate>
+        <form class="contact-form" id="contact-form" method="post" action="contact.php" novalidate>
+          <?php echo csrf_field(); ?>
+          <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($_SERVER["REQUEST_URI"] ?? "/index.php", ENT_QUOTES, "UTF-8"); ?>" />
+
+          <?php if (isset($_GET["contact"])): ?>
+            <?php if ($_GET["contact"] === "sent"): ?>
+              <p class="upload-flash contact-flash" role="status">✉️ Message sent — we'll get back to you soon!</p>
+            <?php else: ?>
+              <p class="auth-error contact-flash" role="alert">
+                <?php echo $_GET["contact"] === "csrf"
+                  ? "Your session expired — please send your message again."
+                  : "Please fill in your name, a valid email, and a message (5+ characters)."; ?>
+              </p>
+            <?php endif; ?>
+          <?php endif; ?>
+
           <div class="line-field">
             <label for="c-name">Name :</label>
             <input type="text" id="c-name" name="name" autocomplete="name" required />

@@ -5,6 +5,20 @@
 $pageTitle = "All Artists — Art Terre Creations";
 $page = "artists";
 include "includes/header.php";
+
+/* ---------- Artists registered on the site (role = artist) ---------- */
+$dbArtists = [];
+$res = $db->query(
+  "SELECT u.id, u.name, COUNT(a.id) AS artwork_count
+   FROM users u
+   LEFT JOIN artworks a ON a.artist_id = u.id AND a.status = 'available'
+   WHERE u.role = 'artist'
+   GROUP BY u.id, u.name
+   ORDER BY artwork_count DESC, u.name ASC"
+);
+if ($res) {
+  $dbArtists = $res->fetch_all(MYSQLI_ASSOC);
+}
 ?>
 
     <!-- ======================= PAGE HERO ======================= -->
@@ -22,6 +36,26 @@ include "includes/header.php";
     <section class="artists section" id="artists">
       <div class="container">
         <div class="artist-grid">
+
+          <!-- ---------- Registered artists (from the DB) ---------- -->
+          <?php foreach ($dbArtists as $a): ?>
+            <article class="artist-card reveal">
+              <div class="artist-photo artist-photo--initial">
+                <span class="artist-initial"><?php echo htmlspecialchars(mb_strtoupper(mb_substr($a["name"], 0, 1)), ENT_QUOTES, "UTF-8"); ?></span>
+              </div>
+              <div class="artist-foot">
+                <button class="like-btn" type="button" aria-label="Like <?php echo htmlspecialchars($a["name"], ENT_QUOTES, "UTF-8"); ?>" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </button>
+                <h3 class="artist-name"><?php echo htmlspecialchars($a["name"], ENT_QUOTES, "UTF-8"); ?></h3>
+                <p class="artist-count">
+                  <?php echo (int) $a["artwork_count"]; ?> artwork<?php echo (int) $a["artwork_count"] === 1 ? "" : "s"; ?>
+                  for sale
+                </p>
+              </div>
+            </article>
+          <?php endforeach; ?>
+
           <article class="artist-card reveal">
             <div class="artist-photo placeholder-square"></div>
             <div class="artist-foot">

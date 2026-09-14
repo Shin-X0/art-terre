@@ -17,10 +17,27 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(255) NOT NULL,
   dob           DATE NULL,                                        /* date of birth (calendar picker)      */
   gender        VARCHAR(20) NULL,                                 /* female/male/non-binary/other/prefer-not */
-  role          ENUM('collector','artist') NOT NULL DEFAULT 'collector',
+  role          ENUM('collector','artist','admin') NOT NULL DEFAULT 'collector',
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_users_email (email)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+/* Contact-form messages (readable by admins in admin-messages.php) */
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id    INT UNSIGNED NULL,                       /* NULL when a guest writes */
+  name       VARCHAR(100) NOT NULL,
+  email      VARCHAR(190) NOT NULL,
+  message    TEXT NOT NULL,
+  is_read    TINYINT(1) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_messages_user (user_id),
+  CONSTRAINT fk_messages_user
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -89,6 +106,15 @@ VALUES ('Demo Artist', 'demo@artterre.com', '$2y$12$6Jbi1qtDGDi5l8..i6TPsO71.TbH
         '1990-06-15', 'male', 'artist')
 ON DUPLICATE KEY UPDATE
   name          = VALUES(name),
+  password_hash = VALUES(password_hash);
+
+-- Site admin account: admin@artterre.com / admin12345 (change it!)
+INSERT INTO users (name, email, password_hash, dob, gender, role)
+VALUES ('Site Admin', 'admin@artterre.com',
+        '$2y$12$gbJo.w8ao2iF2X.e865DsemXvjmsQMNePXnCOJ/qR1dsWj2vWRZzi',
+        '1990-01-01', 'prefer-not', 'admin')
+ON DUPLICATE KEY UPDATE
+  role          = 'admin',
   password_hash = VALUES(password_hash);
 
 -- A couple of demo artworks so the page is not empty after a fresh import

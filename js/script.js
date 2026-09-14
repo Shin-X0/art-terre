@@ -343,33 +343,35 @@ if (newsForm) {
   });
 }
 
-/* --- 7c. Contact form (footer) --- */
+/* --- 7c. Contact form (footer) — posts to contact.php, saved for admins --- */
 const contactForm = $("#contact-form");
 const contactMsg = $("#contact-msg");
 
 if (contactForm) {
   contactForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-
     const name = $("#c-name").value.trim();
     const email = $("#c-email").value.trim();
     const message = $("#c-message").value.trim();
 
+    /* Client-side checks mirror the server rules; a valid form
+       submits naturally so the message is stored for the admin. */
     if (name.length < 2) {
+      e.preventDefault();
       setMsg(contactMsg, "Please enter your name.", "error");
       return;
     }
     if (!EMAIL_RE.test(email)) {
+      e.preventDefault();
       setMsg(contactMsg, "Please enter a valid email address.", "error");
       return;
     }
     if (message.length < 10) {
+      e.preventDefault();
       setMsg(contactMsg, "Message should be at least 10 characters.", "error");
       return;
     }
 
-    setMsg(contactMsg, `Thanks, ${name}! Your message has been sent. (demo)`, "success");
-    contactForm.reset();
+    contactMsg.textContent = "";
   });
 }
 

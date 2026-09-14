@@ -5,6 +5,19 @@
 $pageTitle = "All Artworks — Art Terre Creations";
 $page = "artworks";
 include "includes/header.php";
+
+/* ---------- Artworks uploaded by artists (live from the DB) ---------- */
+$dbArtworks = [];
+$res = $db->query(
+  "SELECT a.id, a.title, a.category, a.story, a.price, a.image_path, u.name AS artist_name
+   FROM artworks a
+   JOIN users u ON u.id = a.artist_id
+   WHERE a.status = 'available'
+   ORDER BY a.created_at DESC, a.id DESC"
+);
+if ($res) {
+  $dbArtworks = $res->fetch_all(MYSQLI_ASSOC);
+}
 ?>
 
     <!-- ======================= PAGE HERO ======================= -->
@@ -29,6 +42,35 @@ include "includes/header.php";
         </div>
 
         <div class="artwork-grid" id="artwork-grid">
+
+          <!-- ---------- Uploaded by artists (from the DB) ---------- -->
+          <?php foreach ($dbArtworks as $art): ?>
+            <article class="artwork-card reveal" data-category="<?php echo htmlspecialchars($art["category"], ENT_QUOTES, "UTF-8"); ?>">
+              <div class="artwork-media">
+                <?php if (!empty($art["image_path"]) && is_file(__DIR__ . "/" . $art["image_path"])): ?>
+                  <img src="<?php echo htmlspecialchars($art["image_path"], ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars($art["title"], ENT_QUOTES, "UTF-8"); ?>" loading="lazy" />
+                <?php else: ?>
+                  <div class="art placeholder-square"></div>
+                <?php endif; ?>
+              </div>
+              <h3 class="artwork-title"><?php echo htmlspecialchars($art["title"], ENT_QUOTES, "UTF-8"); ?></h3>
+              <p class="artwork-artist">by <strong><?php echo htmlspecialchars($art["artist_name"], ENT_QUOTES, "UTF-8"); ?></strong></p>
+              <p class="artwork-story"><?php echo htmlspecialchars($art["story"] ?? "", ENT_QUOTES, "UTF-8"); ?></p>
+              <div class="artwork-actions">
+                <button class="story-toggle" type="button" aria-expanded="false">Story.</button>
+                <div class="artwork-buy">
+                  <span class="artwork-price">$<?php echo number_format((float) $art["price"], 2); ?></span>
+                  <button class="btn btn-accent card-checkout" type="button" aria-label="Checkout <?php echo htmlspecialchars($art["title"], ENT_QUOTES, "UTF-8"); ?>">Checkout</button>
+                  <button class="card-cart" type="button" aria-label="Add <?php echo htmlspecialchars($art["title"], ENT_QUOTES, "UTF-8"); ?> to cart">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
+                      <path d="M2.5 3.5h2.6l2.5 11.2a1.8 1.8 0 0 0 1.8 1.4h7.9a1.8 1.8 0 0 0 1.8-1.4L21 7.5H6.1"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+          <?php endforeach; ?>
 
           <!-- 1. Painting -->
           <article class="artwork-card reveal" data-category="painting">

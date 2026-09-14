@@ -23,12 +23,17 @@ define("DB_USER", "root");
 define("DB_PASS", "");
 define("DB_NAME", "art_terre");
 
-/* ---------- Admins (can manage order statuses) ---------- */
+/* ---------- Admins (role = admin, or emails listed here) ---------- */
 const ADMIN_EMAILS = ["demo@artterre.com"];
 
 function is_admin(?array $user): bool {
-  return $user !== null
-    && in_array(strtolower($user["email"]), ADMIN_EMAILS, true);
+  if ($user === null) {
+    return false;
+  }
+  if (($user["role"] ?? "") === "admin") {
+    return true;
+  }
+  return in_array(strtolower($user["email"]), ADMIN_EMAILS, true);
 }
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
