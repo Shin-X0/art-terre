@@ -3,8 +3,12 @@
    ART TERRE — shared header (head + nav + opening <main>)
    Pages set BEFORE including:
      $pageTitle  (optional) — <title> text
-     $page       (optional) — "home" | "artists" | "artworks"
+     $page       (optional) — "home" | "artists" | "artworks" | ...
    ============================================================ */
+
+require_once __DIR__ . "/config.php";
+require_once __DIR__ . "/auth.php";
+$currentUser = current_user();
 
 $page     = $page     ?? "home";
 $pageTitle = $pageTitle ?? "Art Terre Creations — Where Art Meets Opportunity";
@@ -48,23 +52,34 @@ $base = $isHome ? "" : "index.php";
         <li class="nav-item"><a href="<?php echo $base; ?>#contact" class="nav-link">Contact</a></li>
       </ul>
 
-      <!-- Header sign-in (email + button), as in the mockup -->
-      <div class="header-signin">
-        <form class="signin-form" id="signin-form" novalidate>
-          <input type="email" name="email" id="signin-email" placeholder="Enter your Email Address" autocomplete="email" required />
-          <button type="submit" class="btn btn-accent">Sign in</button>
-        </form>
-        <p class="form-msg" id="signin-msg" role="status" aria-live="polite"></p>
+      <!-- Account: sign-in button (guest) or greeting chip + sign out -->
+      <div class="header-account">
+        <?php if ($currentUser): ?>
+          <?php if (($currentUser["role"] ?? "collector") === "artist"): ?>
+            <a class="sell-link" href="upload-artwork.php">Sell artwork</a>
+          <?php endif; ?>
+          <?php if (is_admin($currentUser)): ?>
+            <a class="sell-link" href="admin-orders.php">Manage orders</a>
+          <?php endif; ?>
+          <a class="user-chip" href="login.php" title="<?php echo htmlspecialchars($currentUser["email"], ENT_QUOTES, "UTF-8"); ?>">
+            <span class="user-avatar"><?php echo htmlspecialchars(mb_strtoupper(mb_substr($currentUser["name"], 0, 1)), ENT_QUOTES, "UTF-8"); ?></span>
+            <span class="user-name">Hi, <?php echo htmlspecialchars(explode(" ", trim($currentUser["name"]))[0], ENT_QUOTES, "UTF-8"); ?></span>
+          </a>
+          <a class="signout-link" href="orders.php">My orders</a>
+          <a class="signout-link" href="logout.php">Sign out</a>
+        <?php else: ?>
+          <a class="btn btn-accent signin-btn" href="login.php">Sign in</a>
+        <?php endif; ?>
       </div>
 
-      <!-- Cart -->
-      <button class="cart-btn" id="cart-btn" aria-label="Shopping cart">
+      <!-- Cart (links to the cart page) -->
+      <a class="cart-btn" id="cart-btn" href="cart.php" aria-label="Shopping cart">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/>
           <path d="M2.5 3.5h2.6l2.5 11.2a1.8 1.8 0 0 0 1.8 1.4h7.9a1.8 1.8 0 0 0 1.8-1.4L21 7.5H6.1"/>
         </svg>
         <span class="cart-count" id="cart-count">0</span>
-      </button>
+      </a>
 
       <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-menu">
         <span class="bar"></span>
