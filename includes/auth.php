@@ -25,6 +25,73 @@ function current_user(): ?array {
   return $user;
 }
 
+/* ============================================================
+   ROLE RULES (enforced server-side in checkout.php + orders):
+   - collector (buyer): BUY only, order status is view-only.
+   - artist (seller/owner): SELL only (cannot buy / checkout),
+     but CAN update the status of orders containing THEIR artworks.
+   - admin: full access (manage all orders + users).
+   ============================================================ */
+function is_artist(?array $user): bool {
+  return $user !== null && ($user["role"] ?? "") === "artist";
+}
+
+function is_collector(?array $user): bool {
+  return $user !== null && ($user["role"] ?? "") === "collector";
+}
+
+/* Order-item columns added by db/migrate_order_ownership.sql.
+   True when order_items has artwork_id/artist_id (live DB already
+   migrated above); code paths fall back gracefully when false. */
+function order_items_have_ownership(): bool {
+  global $db;
+  static $has = null;
+  if ($has !== null) return $has;
+  try {
+    $res = $db->query("SHOW COLUMNS FROM order_items LIKE 'artist_id'");
+    $has = $res && $res->num_rows > 0;
+    if ($res) $res->close();
+  } catch (mysqli_sql_exception $e) {
+    $has = false;
+  }
+  return $has;
+}
+
+/* Can this user change this order's status?
+   - admin: always yes.
+   - seller/artist: yes ONLY when at least one line of the order
+     belongs to them (order_items.artist_id = their id).
+   - buyer/collector: never (view-only). */
+function can_update_order_status(?array $user, int $orderId): bool {
+  global $db;
+  if ($user === null || $orderId <= 0) return false;
+  if (is_admin($user)) return true;
+  if (!is_artist($user)) return false;
+  if (!order_items_have_ownership()) return false;
+  $stmt = $db->prepare(
+    "SELECT 1 FROM order_items WHERE order_id = ? AND artist_id = ? LIMIT 1"
+  );
+  $stmt->bind_param("ii", $orderId, $user["id"]);
+  $stmt->execute();
+  $ok = (bool) $stmt->get_result()->fetch_row();
+  $stmt->close();
+  return $ok;
+}
+
+/* Order ids that contain at least one artwork owned by this seller. */
+function seller_order_ids(int $artistId): array {
+  global $db;
+  if (!order_items_have_ownership()) return [];
+  $stmt = $db->prepare(
+    "SELECT DISTINCT order_id FROM order_items WHERE artist_id = ?"
+  );
+  $stmt->bind_param("i", $artistId);
+  $stmt->execute();
+  $rows = $stmt->get_result()->fetch_all(MYSQLI_NUM);
+  $stmt->close();
+  return array_map(fn($r) => (int) $r[0], $rows);
+}
+
 /* ---------- Sign in / out ---------- */
 function login_user(int $userId): void {
   session_regenerate_id(true);   /* prevent session fixation */

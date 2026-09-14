@@ -45,7 +45,7 @@ if ($res) {
 
           <!-- ---------- Uploaded by artists (from the DB) ---------- -->
           <?php foreach ($dbArtworks as $art): ?>
-            <article class="artwork-card reveal" data-category="<?php echo htmlspecialchars($art["category"], ENT_QUOTES, "UTF-8"); ?>">
+            <article class="artwork-card reveal" data-category="<?php echo htmlspecialchars($art["category"], ENT_QUOTES, "UTF-8"); ?>" data-artwork-id="<?php echo (int) $art["id"]; ?>">
               <div class="artwork-media">
                 <?php if (!empty($art["image_path"]) && is_file(__DIR__ . "/../" . $art["image_path"])): ?>
                   <img src="<?php echo htmlspecialchars($basePath . $art["image_path"], ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars($art["title"], ENT_QUOTES, "UTF-8"); ?>" loading="lazy" />

@@ -45,6 +45,44 @@ if (hamburger && navMenu) {
 }
 
 /* ============================================================
+   1b. ACCOUNT DROPDOWN (avatar chip + three-line indicator)
+   Click the "S Hi, Site" chip to open Manage orders / My orders /
+   Sign out (plus Sell artwork for artist accounts).
+   ============================================================ */
+const accountMenu = $("#account-menu");
+const accountToggle = $("#account-toggle");
+
+function closeAccountMenu() {
+  if (!accountMenu || !accountToggle) return;
+  accountMenu.classList.remove("open");
+  accountToggle.setAttribute("aria-expanded", "false");
+}
+
+if (accountMenu && accountToggle) {
+  accountToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = accountMenu.classList.toggle("open");
+    accountToggle.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  document.addEventListener("click", (e) => {
+    if (
+      accountMenu.classList.contains("open") &&
+      !accountMenu.contains(e.target)
+    ) {
+      closeAccountMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeAccountMenu();
+      closeMenu();
+    }
+  });
+}
+
+/* ============================================================
    2. ACTIVE NAV LINK ON SCROLL (scroll-spy)
    ============================================================ */
 const sections = $$("main section[id], footer[id]");
@@ -145,7 +183,10 @@ $$(".story-toggle").forEach((toggle) => {
 
 /* ============================================================
    6. SHOPPING CART (localStorage — shared by every page)
-   Items: { title, artist, price, qty }
+   Items: { artwork_id (0 for catalogue placeholders), title, artist, price, qty }
+   artwork_id pins DB pieces to their seller so checkout.php can store
+   order_items.artist_id — ONLY that seller (or an admin) may later
+   update the order's status; the buyer stays view-only.
    ============================================================ */
 const CART_KEY = "art-terre-cart";
 const cartCount = $("#cart-count");
@@ -172,9 +213,10 @@ function updateCartCount() {
   if (cartCount) cartCount.textContent = cartQuantity(loadCart());
 }
 
-/* Read title / artist / price straight off the artwork card */
+/* Read title / artist / price + artwork_id straight off the artwork card */
 function readCardInfo(card) {
   return {
+    artwork_id: Number(card?.dataset?.artworkId || 0) || 0,
     title: ($(".artwork-title", card)?.textContent || "Artwork").trim(),
     artist: ($(".artwork-artist strong", card)?.textContent || "").trim(),
     price:
@@ -184,11 +226,15 @@ function readCardInfo(card) {
   };
 }
 
+function cartKey(item) {
+  return item.artwork_id > 0 ? "id:" + item.artwork_id : "t:" + item.title;
+}
+
 function addToCart(card) {
   const items = loadCart();
   const info = readCardInfo(card);
 
-  const existing = items.find((item) => item.title === info.title);
+  const existing = items.find((item) => cartKey(item) === cartKey(info));
   if (existing) existing.qty += 1;
   else items.push({ ...info, qty: 1 });
 

@@ -33,7 +33,7 @@ $base = $isHome ? "" : $basePath . "index.php";
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="<?php echo $basePath; ?>css/style.css?v=23" />
+  <link rel="stylesheet" href="<?php echo $basePath; ?>css/style.css?v=25" />
 </head>
 <body>
 
@@ -53,21 +53,42 @@ $base = $isHome ? "" : $basePath . "index.php";
         <li class="nav-item"><a href="<?php echo $base; ?>#contact" class="nav-link">Contact</a></li>
       </ul>
 
-      <!-- Account: sign-in button (guest) or greeting chip + sign out -->
+      <!-- Account: sign-in button (guest) or avatar chip + dropdown menu -->
       <div class="header-account">
         <?php if ($currentUser): ?>
-          <?php if (($currentUser["role"] ?? "collector") === "artist"): ?>
-            <a class="sell-link" href="<?php echo $basePath; ?>pages/upload-artwork.php">Sell artwork</a>
-          <?php endif; ?>
-          <?php if (is_admin($currentUser)): ?>
-            <a class="sell-link" href="<?php echo $basePath; ?>admin/orders.php">Manage orders</a>
-          <?php endif; ?>
-          <a class="user-chip" href="<?php echo $basePath; ?>pages/login.php" title="<?php echo htmlspecialchars($currentUser["email"], ENT_QUOTES, "UTF-8"); ?>">
-            <span class="user-avatar"><?php echo htmlspecialchars(mb_strtoupper(mb_substr($currentUser["name"], 0, 1)), ENT_QUOTES, "UTF-8"); ?></span>
-            <span class="user-name">Hi, <?php echo htmlspecialchars(explode(" ", trim($currentUser["name"]))[0], ENT_QUOTES, "UTF-8"); ?></span>
-          </a>
-          <a class="signout-link" href="<?php echo $basePath; ?>pages/orders.php">My orders</a>
-          <a class="signout-link" href="<?php echo $basePath; ?>pages/logout.php">Sign out</a>
+          <?php
+            $firstName = htmlspecialchars(explode(" ", trim($currentUser["name"]))[0], ENT_QUOTES, "UTF-8");
+            $initial = htmlspecialchars(mb_strtoupper(mb_substr($currentUser["name"], 0, 1)), ENT_QUOTES, "UTF-8");
+            $emailSafe = htmlspecialchars($currentUser["email"], ENT_QUOTES, "UTF-8");
+            $isArtist = (($currentUser["role"] ?? "collector") === "artist");
+            $isAdmin = is_admin($currentUser);
+            /* Sellers are sell-only: My Sales (update THEIR orders' status),
+               never My Orders / checkout. Buyers get My Orders (view-only). */
+            $isSellerOnly = $isArtist && !$isAdmin;
+          ?>
+          <div class="account-menu" id="account-menu">
+            <button class="user-chip" id="account-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="account-dropdown" title="<?php echo $emailSafe; ?>">
+              <span class="user-avatar"><?php echo $initial; ?></span>
+              <span class="user-name">Hi, <?php echo $firstName; ?></span>
+              <span class="chip-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+            </button>
+            <div class="account-dropdown" id="account-dropdown" role="menu" aria-labelledby="account-toggle">
+              <p class="account-email" title="<?php echo $emailSafe; ?>"><?php echo $emailSafe; ?></p>
+              <?php if ($isArtist): ?>
+                <a class="account-item" href="<?php echo $basePath; ?>pages/upload-artwork.php" role="menuitem">Sell artwork</a>
+              <?php endif; ?>
+              <?php if ($isSellerOnly): ?>
+                <a class="account-item" href="<?php echo $basePath; ?>pages/sales.php" role="menuitem">My sales</a>
+              <?php endif; ?>
+              <?php if ($isAdmin): ?>
+                <a class="account-item" href="<?php echo $basePath; ?>admin/orders.php" role="menuitem">Manage orders</a>
+              <?php endif; ?>
+              <?php if (!$isSellerOnly): ?>
+                <a class="account-item" href="<?php echo $basePath; ?>pages/orders.php" role="menuitem">My orders</a>
+              <?php endif; ?>
+              <a class="account-item account-signout" href="<?php echo $basePath; ?>pages/logout.php" role="menuitem">Sign out</a>
+            </div>
+          </div>
         <?php else: ?>
           <a class="btn btn-accent signin-btn" href="<?php echo $basePath; ?>pages/login.php">Sign in</a>
         <?php endif; ?>

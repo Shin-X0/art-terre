@@ -30,16 +30,24 @@ CREATE TABLE IF NOT EXISTS orders (
   COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS order_items (
-  id       INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  order_id INT UNSIGNED NOT NULL,
-  title    VARCHAR(150) NOT NULL,
-  artist   VARCHAR(100) NULL,
-  price    DECIMAL(10,2) NOT NULL,
-  qty      INT UNSIGNED NOT NULL DEFAULT 1,
+  id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_id   INT UNSIGNED NOT NULL,
+  artwork_id INT UNSIGNED NULL,
+  artist_id  INT UNSIGNED NULL,
+  title      VARCHAR(150) NOT NULL,
+  artist     VARCHAR(100) NULL,
+  price      DECIMAL(10,2) NOT NULL,
+  qty        INT UNSIGNED NOT NULL DEFAULT 1,
   PRIMARY KEY (id),
   KEY idx_order_items_order (order_id),
+  KEY idx_order_items_artist (artist_id),
+  KEY idx_order_items_artwork (artwork_id),
   CONSTRAINT fk_order_items_order
-    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
+  CONSTRAINT fk_order_items_artwork
+    FOREIGN KEY (artwork_id) REFERENCES artworks (id) ON DELETE SET NULL,
+  CONSTRAINT fk_order_items_artist
+    FOREIGN KEY (artist_id) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

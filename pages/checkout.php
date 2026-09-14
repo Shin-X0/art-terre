@@ -5,6 +5,8 @@
    the orders / order_items tables, then the buyer is
    redirected to order-pending.php. Cart items arrive as JSON
    in "cart_json" (filled by js/script.js from localStorage).
+   ROLE RULE: collectors (buyers) only — sellers/artists are
+   sell-only and can never place an order.
    ============================================================ */
 require_once __DIR__ . "/../includes/config.php";
 require_once __DIR__ . "/../includes/auth.php";
@@ -16,6 +18,9 @@ if (!$currentUser) {
   exit;
 }
 
+/* Sellers sell — they can never buy. No checkout form, no POST. */
+$isSeller = is_artist($currentUser) && !is_admin($currentUser);
+
 $errors = [];
 $old = ["name" => "", "email" => "", "address" => "", "city" => "", "zip" => "", "payment" => "cod"];
 
@@ -25,7 +30,10 @@ if ($currentUser) {
   $old["email"] = $currentUser["email"];
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+/* Sellers can never buy — show the notice below instead of ordering. */
+if ($_SERVER["REQUEST_METHOD"] === "POST" && $isSeller) {
+  $errors["form"] = "Seller accounts are sell-only — sign in as a collector to buy artworks.";
+} elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
   if (!csrf_check()) {
     $errors["form"] = "Your session expired — please try again.";
   } else {
@@ -73,7 +81,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       /* Note: card details are validated but NEVER stored — demo only. */
     }
 
-    /* Cart items (JSON snapshot from the browser cart) */
+    /* Cart items (JSON snapshot from the browser cart).
+       artwork_id (when present) pins each line to the real artwork so the
+       SELLER/owner — and only them (or an admin) — can update that order's
+       status later. Buyer-supplied title/artist/price are display fallbacks;
+       ownership always comes from the artworks table, never the browser. */
     $cartItems = [];
     $cartRaw = json_decode($_POST["cart_json"] ?? "[]", true);
     if (is_array($cartRaw)) {
@@ -83,8 +95,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $a = trim((string) ($row["artist"] ?? ""));
         $p = (float) ($row["price"] ?? 0);
         $q = (int) ($row["qty"] ?? 0);
+        $artId = (int) ($row["artwork_id"] ?? $row["id"] ?? 0);
         if ($t === "" || $p <= 0 || $p > 99999.99 || $q < 1 || $q > 99) continue;
+
+        /* Resolve the true owner from the DB — browser data is untrusted. */
+        $ownerId = null;
+        $realArtId = null;
+        if ($artId > 0) {
+          $stmt = $db->prepare("SELECT id, artist_id FROM artworks WHERE id = ? LIMIT 1");
+          $stmt->bind_param("i", $artId);
+          $stmt->execute();
+          $found = $stmt->get_result()->fetch_assoc();
+          $stmt->close();
+          if ($found) {
+            $realArtId = (int) $found["id"];
+            $ownerId   = (int) $found["artist_id"];
+          }
+        }
+
+        /* A seller can never buy their OWN artwork (even via forged requests). */
+        if ($ownerId !== null && (int) $currentUser["id"] === $ownerId) {
+          $errors["form"] = "You can't buy your own artwork — that's what your collectors are for. 🎨";
+          $cartItems = [];
+          break;
+        }
+
         $cartItems[] = [
+          "artwork_id" => $realArtId,
+          "artist_id"  => $ownerId,
           "title"  => mb_substr($t, 0, 150),
           "artist" => $a !== "" ? mb_substr($a, 0, 100) : null,
           "price"  => round($p, 2),
@@ -119,14 +157,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $orderId = (int) $stmt->insert_id;
         $stmt->close();
 
-        $stmt = $db->prepare(
-          "INSERT INTO order_items (order_id, title, artist, price, qty) VALUES (?, ?, ?, ?, ?)"
-        );
-        foreach ($cartItems as $row) {
-          $stmt->bind_param("issdi", $orderId, $row["title"], $row["artist"], $row["price"], $row["qty"]);
-          $stmt->execute();
+        $hasOwnership = order_items_have_ownership();
+        if ($hasOwnership) {
+          $stmt = $db->prepare(
+            "INSERT INTO order_items (order_id, artwork_id, artist_id, title, artist, price, qty) VALUES (?, ?, ?, ?, ?, ?, ?)"
+          );
+          foreach ($cartItems as $row) {
+            $stmt->bind_param("iiissdi", $orderId, $row["artwork_id"], $row["artist_id"], $row["title"], $row["artist"], $row["price"], $row["qty"]);
+            $stmt->execute();
+          }
+          $stmt->close();
+        } else {
+          /* Pre-migration fallback: legacy 5-column shape. */
+          $stmt = $db->prepare(
+            "INSERT INTO order_items (order_id, title, artist, price, qty) VALUES (?, ?, ?, ?, ?)"
+          );
+          foreach ($cartItems as $row) {
+            $stmt->bind_param("issdi", $orderId, $row["title"], $row["artist"], $row["price"], $row["qty"]);
+            $stmt->execute();
+          }
+          $stmt->close();
         }
-        $stmt->close();
 
         $db->commit();
       } catch (mysqli_sql_exception $e) {
@@ -162,7 +213,25 @@ include __DIR__ . "/../includes/header.php";
     <section class="checkout-section section" id="checkout">
       <div class="container checkout-layout" id="checkout-layout">
 
-        <!-- Billing + payment form -->
+        <?php if ($isSeller): ?>
+          <!-- Sellers are sell-only: no buying, no checkout form. -->
+          <div class="checkout-success reveal">
+            <h2>Seller accounts can't check out 🖌️</h2>
+            <p>
+              Your account is sell-only — you list artworks and update the status
+              of orders for pieces you own. Buying is reserved for collector accounts.
+            </p>
+            <?php if (isset($errors["form"])): ?>
+              <p class="auth-error"><?php echo htmlspecialchars($errors["form"], ENT_QUOTES, "UTF-8"); ?></p>
+            <?php endif; ?>
+            <div class="order-actions">
+              <a href="upload-artwork.php" class="btn btn-accent">Sell Artwork</a>
+              <a href="sales.php" class="btn btn-outline">View My Sales</a>
+            </div>
+          </div>
+
+        <?php else: ?>
+        <!-- Billing + payment form (collectors only) -->
         <form class="checkout-form reveal" id="checkout-form" method="post" action="checkout.php" novalidate>
           <?php echo csrf_field(); ?>
           <input type="hidden" name="cart_json" id="cart-json" value="[]" />
@@ -263,8 +332,10 @@ include __DIR__ . "/../includes/header.php";
           <button type="submit" class="btn btn-accent checkout-submit">Place Order</button>
           <p class="form-msg" id="checkout-msg" role="status" aria-live="polite"></p>
         </form>
+        <?php endif; ?>
 
-        <!-- Order summary -->
+        <?php if (!$isSeller): ?>
+        <!-- Order summary (collectors only) -->
         <aside class="cart-summary reveal">
           <h2 class="cart-summary-title">Order Summary</h2>
           <div class="checkout-items" id="checkout-items"></div>
@@ -277,6 +348,7 @@ include __DIR__ . "/../includes/header.php";
             <span id="checkout-total">$0.00</span>
           </div>
         </aside>
+        <?php endif; ?>
 
       </div>
     </section>

@@ -25,19 +25,26 @@ CREATE TABLE IF NOT EXISTS users (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-/* Contact-form messages (readable by admins in admin/messages.php) */
+/* Contact-form messages (readable + replyable by admins in admin/messages.php).
+   reply/replied_at/replied_by hold the admin's answer, shown back to the
+   signed-in sender in pages/messages.php ("My messages"). */
 CREATE TABLE IF NOT EXISTS contact_messages (
   id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id    INT UNSIGNED NULL,                       /* NULL when a guest writes */
   name       VARCHAR(100) NOT NULL,
   email      VARCHAR(190) NOT NULL,
   message    TEXT NOT NULL,
+  reply      TEXT NULL,                               /* admin's reply */
+  replied_at TIMESTAMP NULL,                          /* when the admin replied */
+  replied_by INT UNSIGNED NULL,                       /* which admin replied */
   is_read    TINYINT(1) NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_messages_user (user_id),
   CONSTRAINT fk_messages_user
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+  CONSTRAINT fk_messages_replied_by
+    FOREIGN KEY (replied_by) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -84,18 +91,29 @@ CREATE TABLE IF NOT EXISTS orders (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-/* Line items for each order (title/artist snapshot at purchase time) */
+/* Line items for each order (title/artist snapshot at purchase time).
+   artwork_id/artist_id pin each line to the real artwork + seller, so ONLY
+   that seller (or an admin) can update the order's status — the buyer is
+   view-only. NULL for legacy rows / catalogue placeholder cards. */
 CREATE TABLE IF NOT EXISTS order_items (
-  id       INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  order_id INT UNSIGNED NOT NULL,
-  title    VARCHAR(150) NOT NULL,
-  artist   VARCHAR(100) NULL,
-  price    DECIMAL(10,2) NOT NULL,
-  qty      INT UNSIGNED NOT NULL DEFAULT 1,
+  id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_id   INT UNSIGNED NOT NULL,
+  artwork_id INT UNSIGNED NULL,
+  artist_id  INT UNSIGNED NULL,
+  title      VARCHAR(150) NOT NULL,
+  artist     VARCHAR(100) NULL,
+  price      DECIMAL(10,2) NOT NULL,
+  qty        INT UNSIGNED NOT NULL DEFAULT 1,
   PRIMARY KEY (id),
   KEY idx_order_items_order (order_id),
+  KEY idx_order_items_artist (artist_id),
+  KEY idx_order_items_artwork (artwork_id),
   CONSTRAINT fk_order_items_order
-    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
+  CONSTRAINT fk_order_items_artwork
+    FOREIGN KEY (artwork_id) REFERENCES artworks (id) ON DELETE SET NULL,
+  CONSTRAINT fk_order_items_artist
+    FOREIGN KEY (artist_id) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

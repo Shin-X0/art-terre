@@ -2,7 +2,12 @@
 /* ============================================================
    ART TERRE — Shopping Cart page
    Cart items live in localStorage (see js/script.js §6).
+   Sellers are sell-only: they see a notice instead of checkout.
    ============================================================ */
+require_once __DIR__ . "/../includes/config.php";
+require_once __DIR__ . "/../includes/auth.php";
+$viewer = current_user();
+$isSellerView = $viewer && is_artist($viewer) && !is_admin($viewer);
 $pageTitle = "Your Cart — Art Terre Creations";
 $page = "cart";
 include __DIR__ . "/../includes/header.php";
@@ -49,7 +54,11 @@ include __DIR__ . "/../includes/header.php";
             <span id="cart-total">$0.00</span>
           </div>
 
-          <a href="checkout.php" class="btn btn-accent cart-checkout-btn" id="to-checkout">Proceed to Checkout</a>
+          <a href="checkout.php" class="btn btn-accent cart-checkout-btn" id="to-checkout"<?php echo $isSellerView ? ' hidden aria-hidden="true"' : ''; ?>>Proceed to Checkout</a>
+          <?php if ($isSellerView): ?>
+            <p class="order-note">Seller accounts are sell-only — collectors do the buying.</p>
+            <a href="sales.php" class="btn btn-accent cart-checkout-btn">View My Sales</a>
+          <?php endif; ?>
           <a href="artworks.php" class="cart-continue">Continue shopping</a>
         </aside>
 

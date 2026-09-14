@@ -1,7 +1,10 @@
 <?php
 /* ============================================================
    ART TERRE — Messages inbox (admin only)
-   Contact-form messages: mark as read, delete.
+   Every Contact-Us message lands here in the admin account.
+   The admin can receive it, REPLY (stored as reply/replied_at,
+   shown back to the signed-in sender in pages/messages.php),
+   mark as read, or delete.
    ============================================================ */
 require_once __DIR__ . "/../includes/config.php";
 require_once __DIR__ . "/../includes/auth.php";
@@ -19,10 +22,26 @@ if (!$currentUser || !is_admin($currentUser)) {
   exit;
 }
 
-/* ---------- POST actions: mark read / delete ---------- */
+/* ---------- POST actions: reply / mark read / delete ---------- */
+$flash = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST" && csrf_check()) {
   $action = $_POST["action"] ?? "";
   $msgId  = (int) ($_POST["message_id"] ?? 0);
+
+  if ($action === "reply" && $msgId > 0) {
+    $reply = trim($_POST["reply"] ?? "");
+    if (mb_strlen($reply) >= 2 && mb_strlen($reply) <= 3000) {
+      $stmt = $db->prepare(
+        "UPDATE contact_messages SET reply = ?, replied_at = NOW(), replied_by = ?, is_read = 1 WHERE id = ?"
+      );
+      $stmt->bind_param("sii", $reply, $currentUser["id"], $msgId);
+      $stmt->execute();
+      $stmt->close();
+      $flash = "replied";
+    } else {
+      $flash = "reply-invalid";
+    }
+  }
 
   if ($action === "mark_read" && $msgId > 0) {
     $stmt = $db->prepare("UPDATE contact_messages SET is_read = 1 WHERE id = ?");
@@ -38,12 +57,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && csrf_check()) {
     $stmt->close();
   }
 
-  header("Location: messages.php");
+  header("Location: messages.php" . ($flash !== "" ? "?{$flash}=1" : ""));
   exit;
 }
 
 $messages = $db->query(
-  "SELECT * FROM contact_messages ORDER BY is_read ASC, created_at DESC, id DESC"
+  "SELECT m.*, u.name AS replier_name
+   FROM contact_messages m
+   LEFT JOIN users u ON u.id = m.replied_by
+   ORDER BY m.is_read ASC, m.created_at DESC, m.id DESC"
 )->fetch_all(MYSQLI_ASSOC);
 
 $unread = 0;

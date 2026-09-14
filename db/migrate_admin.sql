@@ -1,6 +1,7 @@
 -- ============================================================
 -- ART TERRE — migration: admin role + admin account
---              + contact_messages table (contact form inbox).
+--              + contact_messages table (contact form inbox)
+--              + admin replies (reply / replied_at / replied_by).
 -- For EXISTING installs. Run in phpMyAdmin on art_terre, or:
 -- C:\xampp12\mysql\bin\mysql.exe -u root < db\migrate_admin.sql
 -- Safe to run more than once (IF NOT EXISTS / ON DUPLICATE KEY).
@@ -17,12 +18,17 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   name       VARCHAR(100) NOT NULL,
   email      VARCHAR(190) NOT NULL,
   message    TEXT NOT NULL,
+  reply      TEXT NULL,                               /* admin's reply */
+  replied_at TIMESTAMP NULL,                          /* when the admin replied */
+  replied_by INT UNSIGNED NULL,                       /* which admin replied */
   is_read    TINYINT(1) NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_messages_user (user_id),
   CONSTRAINT fk_messages_user
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+  CONSTRAINT fk_messages_replied_by
+    FOREIGN KEY (replied_by) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

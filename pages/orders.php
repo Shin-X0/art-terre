@@ -1,8 +1,9 @@
 <?php
 /* ============================================================
    ART TERRE — My Orders page
-   Signed-in customers track their orders and see live status
-   updates from the admin (pending → processing → shipped …).
+   Buyers (collectors) track their orders here — status is
+   VIEW-ONLY: only the artwork's seller/owner (or an admin)
+   can change it. Sellers are redirected to My Sales.
    ============================================================ */
 require_once __DIR__ . "/../includes/config.php";
 require_once __DIR__ . "/../includes/auth.php";
@@ -10,6 +11,12 @@ require_once __DIR__ . "/../includes/auth.php";
 $user = current_user();
 if (!$user) {
   header("Location: login.php");
+  exit;
+}
+
+/* Sellers don't buy — their orders live in My Sales. */
+if (is_artist($user) && !is_admin($user)) {
+  header("Location: sales.php");
   exit;
 }
 
@@ -40,7 +47,7 @@ include __DIR__ . "/../includes/header.php";
     <section class="page-hero">
       <div class="container">
         <h1 class="page-hero-title reveal">My Orders</h1>
-        <p class="page-hero-sub reveal">Every artwork you've ordered, with its live status.</p>
+        <p class="page-hero-sub reveal">Every artwork you've ordered, with its live status (set by the seller — view-only for you).</p>
       </div>
     </section>
 

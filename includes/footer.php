@@ -94,6 +94,6 @@
   <button class="to-top" id="to-top" aria-label="Back to top">↑</button>
 
   <!-- JavaScript -->
-  <script src="<?php echo $basePath; ?>js/script.js?v=9"></script>
+  <script src="<?php echo $basePath; ?>js/script.js?v=11"></script>
 </body>
 </html>

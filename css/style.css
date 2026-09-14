@@ -1584,11 +1584,19 @@ h1, h2, h3, h4 {
   gap: 0.5rem;
   background: rgba(107, 143, 113, 0.18);
   border-radius: 999px;
-  padding: 0.25rem 0.9rem 0.25rem 0.25rem;
+  padding: 0.25rem 0.8rem 0.25rem 0.25rem;
   transition: background var(--transition);
+  font: inherit;
 }
 
+button.user-chip { cursor: pointer; }
+
 .user-chip:hover { background: rgba(107, 143, 113, 0.32); }
+
+.user-chip:focus-visible {
+  outline: 2px solid var(--clr-secondary-dark);
+  outline-offset: 2px;
+}
 
 .user-avatar {
   width: 34px;
@@ -1609,6 +1617,98 @@ h1, h2, h3, h4 {
   color: var(--clr-secondary-dark);
 }
 
+/* Three-line indicator on the avatar chip (opens the account menu) */
+.chip-bars {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-left: 0.15rem;
+}
+
+.chip-bars span {
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--clr-secondary-dark);
+  transition: transform var(--transition), opacity var(--transition);
+}
+
+.account-menu.open .chip-bars span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.account-menu.open .chip-bars span:nth-child(2) { opacity: 0; }
+.account-menu.open .chip-bars span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+
+/* Account dropdown */
+.account-menu {
+  position: relative;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 210px;
+  background: var(--clr-white);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+  display: grid;
+  gap: 0.15rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+  z-index: 120;
+}
+
+.account-menu.open .account-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.account-email {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--clr-muted);
+  padding: 0.5rem 0.8rem 0.6rem;
+  border-bottom: 1px solid var(--clr-primary);
+  margin-bottom: 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 230px;
+}
+
+.account-item {
+  display: block;
+  padding: 0.55rem 0.8rem;
+  border-radius: 9px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--clr-body);
+  transition: background var(--transition), color var(--transition);
+}
+
+.account-item:hover {
+  background: rgba(107, 143, 113, 0.14);
+  color: var(--clr-secondary-deep);
+}
+
+.account-item:focus-visible {
+  outline: 2px solid var(--clr-secondary-dark);
+  outline-offset: -2px;
+}
+
+.account-signout { color: var(--clr-accent-shade); }
+
+.account-signout:hover {
+  background: rgba(163, 58, 42, 0.1);
+  color: var(--clr-accent-shade);
+}
+
+/* Legacy inline links (kept for backwards compatibility) */
 .signout-link {
   font-size: 0.85rem;
   color: var(--clr-muted);
@@ -1618,7 +1718,14 @@ h1, h2, h3, h4 {
 .signout-link:hover { color: var(--clr-accent-shade); }
 
 @media (max-width: 640px) {
-  .signout-link { display: none; }
+  .user-name { display: none; }
+
+  .user-chip { padding-right: 0.7rem; }
+
+  .account-dropdown {
+    right: -8px;
+    min-width: 190px;
+  }
 
   .auth-card { padding: 1.5rem 1.2rem 1.7rem; }
 }
