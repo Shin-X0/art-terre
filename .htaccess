@@ -1,0 +1,24 @@
+# ============================================================
+# ART TERRE — old root URLs -> new locations (permanent, 301)
+# The pages live in pages/ and admin/ now; these rules keep the
+# old root links (bookmarks, history, external refs) working.
+# Query strings (e.g. ?no=AT-XXXXXX) carry over automatically.
+# %1 = the deployment subfolder (e.g. /art-terre, or empty at
+# domain root), so this works wherever the project is installed.
+# ============================================================
+RewriteEngine On
+
+# --- Admin: admin-<page>.php -> admin/<page>.php ---
+RewriteCond %{REQUEST_URI} ^(.*)/admin-([a-z]+)\.php$
+RewriteRule ^admin-([a-z]+)\.php$ %1/admin/$1.php [R=301,L]
+
+# --- Admin: admin.php -> admin/index.php ---
+RewriteCond %{REQUEST_URI} ^(.*)/admin\.php$
+RewriteRule ^admin\.php$ %1/admin/index.php [R=301,L]
+
+# --- Public: any other top-level *.php that isn't a real file -> pages/<same> ---
+# (index.php exists, so it is never redirected; pages/ and admin/ URLs
+#  contain a slash, so they never match either — no redirect loops.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} ^(.*)/([^/]+\.php)$
+RewriteRule ^[^/]+\.php$ %1/pages/%2 [R=301,L]
