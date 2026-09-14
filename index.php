@@ -59,7 +59,7 @@ include "includes/header.php";
         </div>
 
         <div class="section-cta reveal">
-          <a href="artists.php" class="btn btn-outline">View All Artists</a>
+          <a href="pages/artists.php" class="btn btn-outline">View All Artists</a>
         </div>
       </div>
     </section>
@@ -155,7 +155,7 @@ include "includes/header.php";
         </div>
 
         <div class="section-cta reveal">
-          <a href="artworks.php" class="btn btn-outline">View All Artworks</a>
+          <a href="pages/artworks.php" class="btn btn-outline">View All Artworks</a>
         </div>
       </div>
     </section>

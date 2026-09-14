@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-/* Contact-form messages (readable by admins in admin-messages.php) */
+/* Contact-form messages (readable by admins in admin/messages.php) */
 CREATE TABLE IF NOT EXISTS contact_messages (
   id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id    INT UNSIGNED NULL,                       /* NULL when a guest writes */

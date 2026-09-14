@@ -1,6 +1,5 @@
 <?php
-require_once __DIR__ . "/includes/config.php";
-require_once __DIR__ . "/includes/auth.php";
-logout_user();
-header("Location: index.php");
+/* Old URL kept working -> permanent redirect to the new location. */
+$qs = $_SERVER['QUERY_STRING'] ?? '';
+header('Location: pages/logout.php' . ($qs !== '' ? '?' . $qs : ''), true, 301);
 exit;

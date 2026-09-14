@@ -4,8 +4,8 @@
   <footer class="footer" id="contact">
     <div class="container footer-main">
       <div class="footer-brand reveal">
-        <a href="<?php echo ($page ?? "home") === "home" ? "#home" : "index.php"; ?>" class="logo footer-logo" aria-label="Art Terre Creations — Home">
-          <img class="logo-img" src="images/logo.png" alt="Art Terre Creations logo" />
+        <a href="<?php echo ($page ?? "home") === "home" ? "#home" : $basePath . "index.php"; ?>" class="logo footer-logo" aria-label="Art Terre Creations — Home">
+          <img class="logo-img" src="<?php echo $basePath; ?>images/logo.png" alt="Art Terre Creations logo" />
         </a>
 
         <p class="footer-mission">
@@ -36,7 +36,7 @@
           Art Terre? We’d love to hear from you.
         </p>
 
-        <form class="contact-form" id="contact-form" method="post" action="contact.php" novalidate>
+        <form class="contact-form" id="contact-form" method="post" action="<?php echo $basePath; ?>pages/contact.php" novalidate>
           <?php echo csrf_field(); ?>
           <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($_SERVER["REQUEST_URI"] ?? "/index.php", ENT_QUOTES, "UTF-8"); ?>" />
 
@@ -78,13 +78,13 @@
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
         <div class="fb-left">
-          <a href="support.php">Support & Help</a>
-          <a href="faq.php">FAQ</a>
+          <a href="<?php echo $basePath; ?>pages/support.php">Support & Help</a>
+          <a href="<?php echo $basePath; ?>pages/faq.php">FAQ</a>
         </div>
         <div class="fb-right">
-          <a href="terms.php">Terms of services</a>
+          <a href="<?php echo $basePath; ?>pages/terms.php">Terms of services</a>
           <span class="divider" aria-hidden="true"></span>
-          <a href="privacy.php">Privacy Policy</a>
+          <a href="<?php echo $basePath; ?>pages/privacy.php">Privacy Policy</a>
         </div>
       </div>
     </div>
@@ -94,6 +94,6 @@
   <button class="to-top" id="to-top" aria-label="Back to top">↑</button>
 
   <!-- JavaScript -->
-  <script src="js/script.js?v=9"></script>
+  <script src="<?php echo $basePath; ?>js/script.js?v=9"></script>
 </body>
 </html>

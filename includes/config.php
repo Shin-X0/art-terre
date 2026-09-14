@@ -23,6 +23,21 @@ define("DB_USER", "root");
 define("DB_PASS", "");
 define("DB_NAME", "art_terre");
 
+/* ---------- URL base prefix ----------
+   Pages live one folder down (pages/ and admin/), so links and assets
+   (css, images, js) are prefixed with "../" there. Computed from the
+   filesystem location of the page relative to the site root, so it stays
+   correct whether the site is served at the domain root or in a subfolder
+   (e.g. http://localhost/art-terre/). */
+$basePath = "";
+$siteRoot = str_replace("\\", "/", dirname(__DIR__));
+$pageDir  = str_replace("\\", "/", dirname($_SERVER["SCRIPT_FILENAME"] ?? __FILE__));
+$siteRoot = rtrim(str_replace("\\", "/", realpath($siteRoot) ?: $siteRoot), "/");
+$pageDir  = rtrim(str_replace("\\", "/", realpath($pageDir) ?: $pageDir), "/");
+if ($pageDir !== $siteRoot && strpos($pageDir . "/", $siteRoot . "/") === 0) {
+  $basePath = str_repeat("../", substr_count(substr($pageDir, strlen($siteRoot)), "/"));
+}
+
 /* ---------- Admins (role = admin, or emails listed here) ---------- */
 const ADMIN_EMAILS = ["demo@artterre.com"];
 
