@@ -2241,6 +2241,128 @@ button.user-chip { cursor: pointer; }
   font-size: 0.85rem;
 }
 
+.message-unread {
+  border: 2px solid rgba(217, 164, 65, 0.55);
+}
+
+.message-text {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--clr-body);
+  background: var(--clr-primary-soft);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1rem;
+}
+
+.message-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.message-btn {
+  padding: 0.5rem 1.1rem;
+  font-size: 0.85rem;
+}
+
+/* ---------- Sender info box (admin/messages.php — sender box) ---------- */
+.sender-box {
+  background: var(--clr-white);
+  border: 1px solid var(--clr-line);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sender-box-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--clr-secondary-deep);
+}
+
+/* ---------- My messages (pages/messages.php — user inbox) ---------- */
+.user-reply {
+  background: rgba(107, 143, 113, 0.12);
+  border-left: 4px solid var(--clr-secondary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0.8rem 1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+.user-reply p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.user-reply p:first-child {
+  font-weight: 700;
+  color: var(--clr-secondary-dark);
+  margin-bottom: 0.3rem;
+}
+
+/* ---------- Reply textarea (admin/messages.php) ---------- */
+.order-note {
+  margin-top: 1rem;
+}
+
+.order-note-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--clr-secondary-deep);
+  margin-bottom: 0.5rem;
+}
+
+.reply-textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1.5px solid var(--clr-line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+  background: var(--clr-white);
+  color: var(--clr-body);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.reply-textarea:focus {
+  outline: none;
+  border-color: var(--clr-secondary);
+  box-shadow: 0 0 0 3px rgba(107, 143, 113, 0.15);
+}
+
+.order-note-small {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--clr-muted);
+  font-style: italic;
+}
+
+.message-btn {
+  margin-top: 0.5rem;
+}
+
+.user-reply-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--clr-secondary-deep);
+}
+
+.user-reply .message-text {
+  background: var(--clr-white);
+}
+
 /* ============================================================
    Info pages: Support & Help, FAQ, Terms, Privacy
    ============================================================ */

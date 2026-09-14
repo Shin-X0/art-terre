@@ -56,8 +56,8 @@ include __DIR__ . "/../includes/header.php";
 
         <div class="admin-links reveal">
           <a class="admin-link-card" href="messages.php">
-            <strong>✉️ Messages</strong>
-            <small>Read and manage contact-form messages<?php echo $stats["unread"] > 0 ? " ({$stats["unread"]} unread)" : ""; ?></small>
+            <strong>Messages</strong>
+            <small>Receive Contact-Us messages and reply<?php echo $stats["unread"] > 0 ? " ({$stats["unread"]} unread)" : ""; ?></small>
           </a>
           <a class="admin-link-card" href="orders.php">
             <strong>📦 Orders</strong>

@@ -1,8 +1,11 @@
 <?php
 /* ============================================================
    ART TERRE — Contact form handler (footer form on every page)
-   Validates + stores the message in contact_messages, then
-   redirects back to the page the visitor came from.
+   ANY visitor can write (guest or signed in). The message is stored
+   in contact_messages and lands in the ADMIN's inbox
+   (admin/messages.php), where the admin receives it and replies.
+   Signed-in senders read the admin's reply in pages/messages.php
+   ("My messages"); guests get the answer by email.
    ============================================================ */
 require_once __DIR__ . "/../includes/config.php";
 require_once __DIR__ . "/../includes/auth.php";

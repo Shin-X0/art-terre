@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /* ============================================================
    ART TERRE — shared header (head + nav + opening <main>)
    Pages set BEFORE including:
@@ -33,7 +33,7 @@ $base = $isHome ? "" : $basePath . "index.php";
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="<?php echo $basePath; ?>css/style.css?v=25" />
+  <link rel="stylesheet" href="<?php echo $basePath; ?>css/style.css?v=26" />
 </head>
 <body>
 
@@ -82,10 +82,12 @@ $base = $isHome ? "" : $basePath . "index.php";
               <?php endif; ?>
               <?php if ($isAdmin): ?>
                 <a class="account-item" href="<?php echo $basePath; ?>admin/orders.php" role="menuitem">Manage orders</a>
+                <a class="account-item" href="<?php echo $basePath; ?>admin/messages.php" role="menuitem">Inbox</a>
               <?php endif; ?>
               <?php if (!$isSellerOnly): ?>
                 <a class="account-item" href="<?php echo $basePath; ?>pages/orders.php" role="menuitem">My orders</a>
               <?php endif; ?>
+              <a class="account-item" href="<?php echo $basePath; ?>pages/messages.php" role="menuitem">My messages</a>
               <a class="account-item account-signout" href="<?php echo $basePath; ?>pages/logout.php" role="menuitem">Sign out</a>
             </div>
           </div>
